@@ -1,13 +1,12 @@
-package problems.qbf;
+package problems.qbfpt;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StreamTokenizer;
-import java.util.Arrays;
 import problems.Evaluator;
 import solutions.Solution;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * A quadractic binary function (QBFPT) is a function that can be expressed as the
@@ -23,7 +22,10 @@ import solutions.Solution;
  * @author ccavellucci, fusberti
  *
  */
-public class QBF implements Evaluator<Integer> {
+public class QBFPT implements Evaluator<Integer> {
+
+	private static final int PI1 = 193;
+	private static final int PI2 = 1093;
 
 	/**
 	 * Dimension of the domain.
@@ -40,6 +42,8 @@ public class QBF implements Evaluator<Integer> {
 	 */
 	public Double[][] A;
 
+	private ArrayList<int[]> triples;
+
 	/**
 	 * The constructor for QuadracticBinaryFunction class. The filename of the
 	 * input for setting matrix of coefficients A of the QBFPT. The dimension of
@@ -50,9 +54,52 @@ public class QBF implements Evaluator<Integer> {
 	 * @throws IOException
 	 *             Necessary for I/O operations.
 	 */
-	public QBF(String filename) throws IOException {
+	public QBFPT(String filename) throws IOException {
 		size = readInput(filename);
 		variables = allocateVariables();
+	}
+
+	private int[] generate_triple_aux(int u, int n){
+		int l = 1 + ((PI1 * (u - 1) + PI2) % n);
+		int g;
+
+		if(l  != u){
+			g = l;
+		}else{
+			g = 1 + (l % n);
+		}
+
+		int h;
+
+		if(l != u && l != g){
+			h = l;
+		}else{
+			int aux = (1 + (l % n));
+			if(aux != u && aux != g){
+				h = aux;
+			}else{
+				h = 1 + ((l + 1) % n);
+			}
+		}
+
+		ArrayList tuple = new ArrayList<Integer>();
+		tuple.add(u);
+		tuple.add(g);
+		tuple.add(h);
+		Collections.sort(tuple);
+
+		int output[] = {((Integer)tuple.get(0)).intValue(),
+						((Integer)tuple.get(1)).intValue(),
+						((Integer)tuple.get(2)).intValue()};
+		return output;
+	}
+
+	private void generate_triples(){
+
+	}
+
+	public ArrayList<int[]> getTriples() {
+		return triples;
 	}
 
 	/**
@@ -87,8 +134,8 @@ public class QBF implements Evaluator<Integer> {
 	 * {@inheritDoc} In the case of a QBFPT, the evaluation correspond to
 	 * computing a matrix multiplication x'.A.x. A better way to evaluate this
 	 * function when at most two variables are modified is given by methods
-	 * {@link #evaluateInsertionQBF(int)}, {@link #evaluateRemovalQBF(int)} and
-	 * {@link #evaluateExchangeQBF(int,int)}.
+	 * {@link #evaluateInsertionQBFPT(int)}, {@link #evaluateRemovalQBFPT(int)} and
+	 * {@link #evaluateExchangeQBFPT(int,int)}.
 	 * 
 	 * @return The evaluation of the QBFPT.
 	 */
@@ -96,7 +143,7 @@ public class QBF implements Evaluator<Integer> {
 	public Double evaluate(Solution<Integer> sol) {
 
 		setVariables(sol);
-		return sol.cost = evaluateQBF();
+		return sol.cost = evaluateQBFPT();
 
 	}
 
@@ -106,7 +153,7 @@ public class QBF implements Evaluator<Integer> {
 	 * 
 	 * @return The value of the QBFPT.
 	 */
-	public Double evaluateQBF() {
+	public Double evaluateQBFPT() {
 
 		Double aux = (double) 0, sum = (double) 0;
 		Double vecAux[] = new Double[size];
@@ -134,7 +181,7 @@ public class QBF implements Evaluator<Integer> {
 	public Double evaluateInsertionCost(Integer elem, Solution<Integer> sol) {
 
 		setVariables(sol);
-		return evaluateInsertionQBF(elem);
+		return evaluateInsertionQBFPT(elem);
 
 	}
 
@@ -147,12 +194,12 @@ public class QBF implements Evaluator<Integer> {
 	 * @return The variation of the objective function resulting from the
 	 *         insertion.
 	 */
-	public Double evaluateInsertionQBF(int i) {
+	public Double evaluateInsertionQBFPT(int i) {
 
 		if (variables[i] == 1)
 			return 0.0;
 
-		return evaluateContributionQBF(i);
+		return evaluateContributionQBFPT(i);
 	}
 
 	/*
@@ -165,7 +212,7 @@ public class QBF implements Evaluator<Integer> {
 	public Double evaluateRemovalCost(Integer elem, Solution<Integer> sol) {
 
 		setVariables(sol);
-		return evaluateRemovalQBF(elem);
+		return evaluateRemovalQBFPT(elem);
 
 	}
 
@@ -178,12 +225,12 @@ public class QBF implements Evaluator<Integer> {
 	 * @return The variation of the objective function resulting from the
 	 *         removal.
 	 */
-	public Double evaluateRemovalQBF(int i) {
+	public Double evaluateRemovalQBFPT(int i) {
 
 		if (variables[i] == 0)
 			return 0.0;
 
-		return -evaluateContributionQBF(i);
+		return -evaluateContributionQBFPT(i);
 
 	}
 
@@ -197,7 +244,7 @@ public class QBF implements Evaluator<Integer> {
 	public Double evaluateExchangeCost(Integer elemIn, Integer elemOut, Solution<Integer> sol) {
 
 		setVariables(sol);
-		return evaluateExchangeQBF(elemIn, elemOut);
+		return evaluateExchangeQBFPT(elemIn, elemOut);
 
 	}
 
@@ -214,19 +261,19 @@ public class QBF implements Evaluator<Integer> {
 	 * @return The variation of the objective function resulting from the
 	 *         exchange.
 	 */
-	public Double evaluateExchangeQBF(int in, int out) {
+	public Double evaluateExchangeQBFPT(int in, int out) {
 
 		Double sum = 0.0;
 
 		if (in == out)
 			return 0.0;
 		if (variables[in] == 1)
-			return evaluateRemovalQBF(out);
+			return evaluateRemovalQBFPT(out);
 		if (variables[out] == 0)
-			return evaluateInsertionQBF(in);
+			return evaluateInsertionQBFPT(in);
 
-		sum += evaluateContributionQBF(in);
-		sum -= evaluateContributionQBF(out);
+		sum += evaluateContributionQBFPT(in);
+		sum -= evaluateContributionQBFPT(out);
 		sum -= (A[in][out] + A[out][in]);
 
 		return sum;
@@ -237,7 +284,7 @@ public class QBF implements Evaluator<Integer> {
 	 * insertion of an element. This method is faster than evaluating the whole
 	 * solution, since it uses the fact that only one line and one column from
 	 * matrix A needs to be evaluated when inserting a new element into the
-	 * solution. This method is different from {@link #evaluateInsertionQBF(int)},
+	 * solution. This method is different from {@link #evaluateInsertionQBFPT(int)},
 	 * since it disregards the fact that the element might already be in the
 	 * solution.
 	 * 
@@ -246,7 +293,7 @@ public class QBF implements Evaluator<Integer> {
 	 * @return the variation of the objective function resulting from the
 	 *         insertion.
 	 */
-	private Double evaluateContributionQBF(int i) {
+	private Double evaluateContributionQBFPT(int i) {
 
 		Double sum = 0.0;
 

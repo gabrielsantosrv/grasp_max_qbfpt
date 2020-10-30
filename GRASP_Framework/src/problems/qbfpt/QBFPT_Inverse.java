@@ -1,15 +1,15 @@
-package problems.qbf;
+package problems.qbfpt;
 
 import java.io.IOException;
 
 /**
  * Class representing the inverse of the Quadractic Binary Function
- * ({@link QBF}), which is used since the GRASP is set by
+ * ({@link QBFPT}), which is used since the GRASP is set by
  * default as a minimization procedure.
  * 
  * @author ccavellucci, fusberti
  */
-public class QBF_Inverse extends QBF {
+public class QBFPT_Inverse extends QBFPT {
 
 	/**
 	 * Constructor for the QBFPT_Inverse class.
@@ -20,7 +20,7 @@ public class QBF_Inverse extends QBF {
 	 * @throws IOException
 	 *             Necessary for I/O operations.
 	 */
-	public QBF_Inverse(String filename) throws IOException {
+	public QBFPT_Inverse(String filename) throws IOException {
 		super(filename);
 	}
 
@@ -29,32 +29,32 @@ public class QBF_Inverse extends QBF {
 	 * @see problems.qbf.QBFPT#evaluate()
 	 */
 	@Override
-	public Double evaluateQBF() {
-		return -super.evaluateQBF();
+	public Double evaluateQBFPT() {
+		return -super.evaluateQBFPT();
 	}
 	
 	/* (non-Javadoc)
 	 * @see problems.qbf.QBFPT#evaluateInsertion(int)
 	 */
 	@Override
-	public Double evaluateInsertionQBF(int i) {	
-		return -super.evaluateInsertionQBF(i);
+	public Double evaluateInsertionQBFPT(int i) {
+		return -super.evaluateInsertionQBFPT(i);
 	}
 	
 	/* (non-Javadoc)
 	 * @see problems.qbf.QBFPT#evaluateRemoval(int)
 	 */
 	@Override
-	public Double evaluateRemovalQBF(int i) {
-		return -super.evaluateRemovalQBF(i);
+	public Double evaluateRemovalQBFPT(int i) {
+		return -super.evaluateRemovalQBFPT(i);
 	}
 	
 	/* (non-Javadoc)
 	 * @see problems.qbf.QBFPT#evaluateExchange(int, int)
 	 */
 	@Override
-	public Double evaluateExchangeQBF(int in, int out) {
-		return -super.evaluateExchangeQBF(in,out);
+	public Double evaluateExchangeQBFPT(int in, int out) {
+		return -super.evaluateExchangeQBFPT(in,out);
 	}
 
 }

@@ -1,12 +1,11 @@
-package problems.qbf.solvers;
+package problems.qbfpt.solvers;
+
+import metaheuristics.grasp.AbstractGRASP;
+import problems.qbfpt.QBFPT_Inverse;
+import solutions.Solution;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import metaheuristics.grasp.AbstractGRASP;
-import problems.qbf.QBF_Inverse;
-import solutions.Solution;
-
 
 
 /**
@@ -17,7 +16,7 @@ import solutions.Solution;
  * 
  * @author ccavellucci, fusberti
  */
-public class GRASP_QBF extends AbstractGRASP<Integer> {
+public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 
 	/**
 	 * Constructor for the GRASP_QBFPT class. An inverse QBFPT objective function is
@@ -34,8 +33,8 @@ public class GRASP_QBF extends AbstractGRASP<Integer> {
 	 * @throws IOException
 	 *             necessary for I/O operations.
 	 */
-	public GRASP_QBF(Double alpha, Integer iterations, String filename) throws IOException {
-		super(new QBF_Inverse(filename), alpha, iterations);
+	public GRASP_QBFPT(Double alpha, Integer iterations, String filename) throws IOException {
+		super(new QBFPT_Inverse(filename), alpha, iterations);
 	}
 
 	/*
@@ -165,7 +164,7 @@ public class GRASP_QBF extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBF grasp = new GRASP_QBF(0.05, 1000, "instances/qbf020");
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 1000, "instances/qbf020");
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime   = System.currentTimeMillis();
