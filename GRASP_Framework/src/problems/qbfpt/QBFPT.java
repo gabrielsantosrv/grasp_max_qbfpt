@@ -97,11 +97,12 @@ public class QBFPT implements Evaluator<Integer> {
 
 	private ArrayList<int[]> generate_triples(){
 		ArrayList<int[]> _triples = new ArrayList<>();
-		for(int i=1; i <= this.size; i++){
+		for(int i=0; i < this.size; i++){
 			int[] triple = generate_triple_aux(i, this.size);
 			_triples.add(triple);
 		}
-
+		int[] aux = {2, 4, 14};
+		_triples.add(aux);
 		return _triples;
 	}
 
@@ -110,7 +111,7 @@ public class QBFPT implements Evaluator<Integer> {
 			if(i == tuple[0] || i == tuple[1] || i == tuple[2]){
 				double sum = 0;
 				for(int k=0; k<=2; k++){
-					sum += this.variables[tuple[0]];
+					sum += this.variables[k];
 				}
 
 				//if there are 2 indeces in a tuple that have already been set to 1
@@ -224,7 +225,7 @@ public class QBFPT implements Evaluator<Integer> {
 
 		if(!is_index_permitted(i))
 			//block inserting the element i in the solution
-			return Double.NEGATIVE_INFINITY;
+			return Double.POSITIVE_INFINITY;
 
 		return evaluateContributionQBFPT(i);
 	}
@@ -312,7 +313,7 @@ public class QBFPT implements Evaluator<Integer> {
 			//if IN is prohibited and IN and OUT are not in the same tuple,
 			//then set IN to 1 will break the prohibition rule
 			if (!is_in_out_same_tuple){
-				return Double.NEGATIVE_INFINITY;
+				return Double.POSITIVE_INFINITY;
 			}
 		}
 
