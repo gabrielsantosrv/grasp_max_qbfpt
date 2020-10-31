@@ -57,6 +57,7 @@ public class QBFPT implements Evaluator<Integer> {
 	public QBFPT(String filename) throws IOException {
 		size = readInput(filename);
 		variables = allocateVariables();
+		triples = generate_triples();
 	}
 
 	private int[] generate_triple_aux(int u, int n){
@@ -94,12 +95,34 @@ public class QBFPT implements Evaluator<Integer> {
 		return output;
 	}
 
-	private void generate_triples(){
+	private ArrayList<int[]> generate_triples(){
+		ArrayList<int[]> _triples = new ArrayList<>();
+		for(int i=1; i <= this.size; i++){
+			int[] triple = generate_triple_aux(i, this.size);
+			_triples.add(triple);
+		}
 
+		return _triples;
 	}
 
-	public ArrayList<int[]> getTriples() {
-		return triples;
+	private boolean is_index_permitted(int i){
+		for(int [] tuple : this.triples){
+			if(i == tuple[0] || i == tuple[1] || i == tuple[2]){
+				double sum = 0;
+				for(int k=0; k<=2; k++){
+					sum += this.variables[tuple[0]];
+				}
+
+				//if there are 2 indeces in a tuple that have already been set to 1
+				//and the index i isn't of theses indeces, then set it to 1 will
+				//complete a prohibited tuple.
+				if(sum == 2.0 && this.variables[i] == 0.0){
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -199,6 +222,10 @@ public class QBFPT implements Evaluator<Integer> {
 		if (variables[i] == 1)
 			return 0.0;
 
+		if(!is_index_permitted(i))
+			//block inserting the element i in the solution
+			return Double.NEGATIVE_INFINITY;
+
 		return evaluateContributionQBFPT(i);
 	}
 
@@ -271,6 +298,23 @@ public class QBFPT implements Evaluator<Integer> {
 			return evaluateRemovalQBFPT(out);
 		if (variables[out] == 0)
 			return evaluateInsertionQBFPT(in);
+
+		if (!is_index_permitted(in)){
+			boolean is_in_out_same_tuple = false;
+			for(int[] tuple : this.triples){
+				if((tuple[0] == in || tuple[1] == in || tuple[2] == in) &&
+				   (tuple[0] == out || tuple[1] == out || tuple[2] == out)){
+					is_in_out_same_tuple = true;
+					break;
+				}
+			}
+
+			//if IN is prohibited and IN and OUT are not in the same tuple,
+			//then set IN to 1 will break the prohibition rule
+			if (!is_in_out_same_tuple){
+				return Double.NEGATIVE_INFINITY;
+			}
+		}
 
 		sum += evaluateContributionQBFPT(in);
 		sum -= evaluateContributionQBFPT(out);
@@ -372,4 +416,10 @@ public class QBFPT implements Evaluator<Integer> {
 
 	}
 
+	public void printTriples(){
+		for(int[] tuple : triples)
+			System.out.print("("+tuple[0]+","+tuple[1]+","+tuple[2]+"), ");
+
+		System.out.println();
+	}
 }

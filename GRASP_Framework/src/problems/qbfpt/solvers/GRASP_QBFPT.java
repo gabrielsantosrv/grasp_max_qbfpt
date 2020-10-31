@@ -1,6 +1,7 @@
 package problems.qbfpt.solvers;
 
 import metaheuristics.grasp.AbstractGRASP;
+import problems.qbfpt.QBFPT;
 import problems.qbfpt.QBFPT_Inverse;
 import solutions.Solution;
 
@@ -167,6 +168,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 1000, "instances/qbf020");
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
+		((QBFPT)grasp.ObjFunction).printTriples();
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println("Time = "+(double)totalTime/(double)1000+" seg");
