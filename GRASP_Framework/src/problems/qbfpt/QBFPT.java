@@ -106,7 +106,10 @@ public class QBFPT implements Evaluator<Integer> {
 		return _triples;
 	}
 
-	private boolean is_index_permitted(int i){
+	/**
+	* Test whether the solution obtained with the insertion of i will be feasible
+	* */
+	public boolean is_feasible(int i){
 		for(int [] tuple : this.triples){
 			if(i == tuple[0] || i == tuple[1] || i == tuple[2]){
 				double sum = 0;
@@ -223,10 +226,6 @@ public class QBFPT implements Evaluator<Integer> {
 		if (variables[i] == 1)
 			return 0.0;
 
-		if(!is_index_permitted(i))
-			//block inserting the element i in the solution
-			return Double.POSITIVE_INFINITY;
-
 		return evaluateContributionQBFPT(i);
 	}
 
@@ -299,23 +298,6 @@ public class QBFPT implements Evaluator<Integer> {
 			return evaluateRemovalQBFPT(out);
 		if (variables[out] == 0)
 			return evaluateInsertionQBFPT(in);
-
-		if (!is_index_permitted(in)){
-			boolean is_in_out_same_tuple = false;
-			for(int[] tuple : this.triples){
-				if((tuple[0] == in || tuple[1] == in || tuple[2] == in) &&
-				   (tuple[0] == out || tuple[1] == out || tuple[2] == out)){
-					is_in_out_same_tuple = true;
-					break;
-				}
-			}
-
-			//if IN is prohibited and IN and OUT are not in the same tuple,
-			//then set IN to 1 will break the prohibition rule
-			if (!is_in_out_same_tuple){
-				return Double.POSITIVE_INFINITY;
-			}
-		}
 
 		sum += evaluateContributionQBFPT(in);
 		sum -= evaluateContributionQBFPT(out);

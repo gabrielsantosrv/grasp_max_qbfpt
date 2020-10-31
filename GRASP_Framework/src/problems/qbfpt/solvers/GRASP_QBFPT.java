@@ -77,9 +77,12 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 */
 	@Override
 	public void updateCL() {
-
-		// do nothing since all elements off the solution are viable candidates.
-
+		ArrayList<Integer> CL_copy = new ArrayList<>(this.CL);
+		for (Integer c : CL_copy){
+			if(!((QBFPT)this.ObjFunction).is_feasible(c)){
+				this.CL.remove(c);
+			}
+		}
 	}
 
 	/**
@@ -165,7 +168,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25, 1000, "instances/qbf020");
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.05, 1000, "instances/qbf020");
 		((QBFPT)grasp.ObjFunction).printTriples();
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
