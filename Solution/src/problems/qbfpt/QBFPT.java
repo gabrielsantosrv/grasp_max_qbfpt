@@ -129,8 +129,8 @@ public class QBFPT implements Evaluator<Integer> {
 			// If the value is in a triple, check if triple is in the current solution.
 			if(i == tuple[0] || i == tuple[1] || i == tuple[2]){
 				sum = 0;
-				for(int k=0; k<=2; k++){
-					sum += this.variables[tuple[k]];
+				for(int k : tuple){
+					sum += this.variables[k];
 				}
 
 				//if there are 2 indices in a tuple that have already been set to 1
