@@ -154,6 +154,7 @@ public abstract class AbstractGRASP<E> {
 			double maxCost = Double.NEGATIVE_INFINITY, minCost = Double.POSITIVE_INFINITY;
 			currentCost = ObjFunction.evaluate(currentSol);
 			updateCL();
+			if(this.CL.size() == 0) break;
 
 			/*
 			 * Explore all candidate elements to enter the solution, saving the
