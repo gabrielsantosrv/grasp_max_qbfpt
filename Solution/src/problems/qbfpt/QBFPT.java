@@ -22,7 +22,10 @@ import java.util.Arrays;
  *
  */
 public class QBFPT implements Evaluator<Integer> {
-
+	
+	/**
+	 * PI values for triple generation. 
+	 */
 	private static final int GPI1 = 131;
 	private static final int GPI2 = 1031;
 	private static final int HPI1 = 193;

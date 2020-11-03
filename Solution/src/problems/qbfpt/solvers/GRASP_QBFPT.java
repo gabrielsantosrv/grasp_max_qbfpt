@@ -18,7 +18,17 @@ import java.util.ArrayList;
  * @author ccavellucci, fusberti
  */
 public class GRASP_QBFPT extends AbstractGRASP<Integer> {
-
+	private enum SearchStrategy {
+		FI,
+		BI
+	}
+	
+	/**
+	 * Value to represent local search type.
+	 * Can be first-improving (FI) or best-improving (BI). 
+	 */
+	private final SearchStrategy searchType;
+	
 	/**
 	 * Constructor for the GRASP_QBFPT class. An inverse QBFPT objective function is
 	 * passed as argument for the superclass constructor.
@@ -31,11 +41,14 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * @param filename
 	 *            Name of the file for which the objective function parameters
 	 *            should be read.
+	 * @param type
+	 * 			  Type of local search strategy to be used.
 	 * @throws IOException
 	 *             necessary for I/O operations.
 	 */
-	public GRASP_QBFPT(Double alpha, Integer iterations, String filename) throws IOException {
+	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, SearchStrategy type) throws IOException {
 		super(new QBFPT_Inverse(filename), alpha, iterations);
+		this.searchType = type;
 	}
 
 	/*
@@ -63,11 +76,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 */
 	@Override
 	public ArrayList<Integer> makeRCL() {
-
-		ArrayList<Integer> _RCL = new ArrayList<Integer>();
-
-		return _RCL;
-
+		return new ArrayList<Integer>();
 	}
 
 	/*
@@ -106,7 +115,22 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * composed by the neighborhood moves Insertion, Removal and 2-Exchange.
 	 */
 	@Override
-	public Solution<Integer> localSearch() {
+	public Solution<Integer> localSearch(){
+		Solution<Integer> sol;
+		
+		// Check local search method.
+		if (this.searchType == SearchStrategy.BI)
+			sol = localSearchBestImproving();
+		else
+			sol = localSearchFirstImproving();
+	
+		return sol;
+	}
+	
+	/**
+	 * Best-Improving local search.
+	 */
+	private Solution<Integer> localSearchBestImproving() {
 
 		Double minDeltaCost;
 		Integer bestCandIn = null, bestCandOut = null;
@@ -160,15 +184,77 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 
 		return null;
 	}
+	
+	/**
+	 * First-Improving local search.
+	 */
+	private Solution<Integer> localSearchFirstImproving() {
+
+		Double minDeltaCost;
+		Integer firstCandIn = null, firstCandOut = null;
+
+		do {
+			minDeltaCost = Double.POSITIVE_INFINITY;
+			updateCL();
+				
+			// Evaluate insertions
+			for (Integer candIn : CL) {
+				double deltaCost = ObjFunction.evaluateInsertionCost(candIn, currentSol);
+				if (deltaCost < minDeltaCost) {
+					minDeltaCost = deltaCost;
+					firstCandIn = candIn;
+					firstCandOut = null;
+					break;
+				}
+			}
+			
+			// Evaluate removals
+			for (Integer candOut : currentSol) {
+				double deltaCost = ObjFunction.evaluateRemovalCost(candOut, currentSol);
+				if (deltaCost < minDeltaCost) {
+					minDeltaCost = deltaCost;
+					firstCandIn = null;
+					firstCandOut = candOut;
+					break;
+				}
+			}
+			
+			// Evaluate exchanges
+			for (Integer candIn : CL) {
+				for (Integer candOut : currentSol) {
+					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, currentSol);
+					if (deltaCost < minDeltaCost) {
+						minDeltaCost = deltaCost;
+						firstCandIn = candIn;
+						firstCandOut = candOut;
+						break;
+					}
+				}
+			}
+			// Implement the best first move, if it reduces the solution cost.
+			if (minDeltaCost < -Double.MIN_VALUE) {
+				if (firstCandOut != null) {
+					currentSol.remove(firstCandOut);
+					CL.add(firstCandOut);
+				}
+				if (firstCandIn != null) {
+					currentSol.add(firstCandIn);
+					CL.remove(firstCandIn);
+				}
+				ObjFunction.evaluate(currentSol);
+			}
+		} while (minDeltaCost < -Double.MIN_VALUE);
+
+		return null;
+	}
 
 	/**
 	 * A main method used for testing the GRASP metaheuristic.
-	 * 
 	 */
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25, 1000, "instances/qbf020");
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25, 1000, "instances/qbf020", SearchStrategy.BI);
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 
