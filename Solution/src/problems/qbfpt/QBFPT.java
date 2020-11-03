@@ -113,26 +113,37 @@ public class QBFPT implements Evaluator<Integer> {
 	}
 
 	/**
-	* Test whether the solution obtained with the insertion of i will be feasible
-	* */
+	 * Test whether the solution obtained with the insertion of i will be feasible.
+	 * For this, checks triple restriction.
+	 * Checks if the 2 other elements of all triples with i are in the current solution.
+	 * @param i Value to check feasibility.
+	 * @return feasible: true if i is feasible, false otherwise.
+	 */
 	public boolean is_feasible(int i){
+		boolean feasible = true;
+		double sum;
+		
+		// Check all triples.
 		for(int [] tuple : this.triples){
+			
+			// If the value is in a triple, check if triple is in the current solution.
 			if(i == tuple[0] || i == tuple[1] || i == tuple[2]){
-				double sum = 0;
+				sum = 0;
 				for(int k=0; k<=2; k++){
-					sum += this.variables[k];
+					sum += this.variables[tuple[k]];
 				}
 
-				//if there are 2 indeces in a tuple that have already been set to 1
-				//and the index i isn't of theses indeces, then set it to 1 will
+				//if there are 2 indices in a tuple that have already been set to 1
+				//and the index i isn't of theses indices, then set it to 1 will
 				//complete a prohibited tuple.
 				if(sum == 2.0 && this.variables[i] == 0.0){
-					return false;
+					feasible = false;
+					break;
 				}
 			}
 		}
 
-		return true;
+		return feasible;
 	}
 
 	/**
@@ -407,7 +418,7 @@ public class QBFPT implements Evaluator<Integer> {
 
 	public void printTriples(){
 		for(int[] tuple : triples)
-			System.out.print("("+tuple[0]+","+tuple[1]+","+tuple[2]+"), ");
+			System.out.print("("+(tuple[0]+1)+","+(tuple[1]+1)+","+(tuple[2]+1)+"), ");
 
 		System.out.println();
 	}
