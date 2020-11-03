@@ -247,6 +247,43 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 
 		return null;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * The QBFPT random choice follows a bias function.
+	 * Get the bias for each value, calculate probability, and choose element.
+	 */
+	@Override
+	public Integer chooseRandom(){
+		double probs[] = new double[RCL.size()];
+		double totalBias = 0;
+		int i;
+		
+		// Get bias.
+		for(i=0; i<RCL.size(); i++) {
+			probs[i] = 1;
+			totalBias += 1;
+		}
+		
+		// Calculate probabilities.
+		for(i=0; i<RCL.size(); i++) {
+			probs[i] /= totalBias;
+		}
+		
+		// Get random value from weighted probs.
+		int rndIndex=0;
+		double rndValue = rng.nextDouble();
+		for(i=0; i<RCL.size(); i++) {
+			if(rndValue < probs[i]) {
+				rndIndex = i;
+				break;
+			}
+			rndValue -= probs[i];
+		}
+		
+		return RCL.get(rndIndex);
+	}
 
 	/**
 	 * A main method used for testing the GRASP metaheuristic.
@@ -254,14 +291,16 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25, 1000, "instances/qbf020", SearchStrategy.BI);
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25, 
+											1000,
+											"instances/qbf020", 
+											SearchStrategy.BI);
+		
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println("Time = "+(double)totalTime/(double)1000+" seg");
-
 	}
-
 }

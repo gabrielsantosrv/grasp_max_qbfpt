@@ -28,7 +28,7 @@ public abstract class AbstractGRASP<E> {
 	/**
 	 * a random number generator
 	 */
-	static Random rng = new Random(0);
+	protected static Random rng = new Random(0);
 
 	/**
 	 * the objective function being optimized
@@ -116,6 +116,13 @@ public abstract class AbstractGRASP<E> {
 	 * @return An local optimum solution.
 	 */
 	public abstract Solution<E> localSearch();
+	
+	/**
+	 * Function to randomly choose a candidate from the RCL.
+	 * 
+	 * @return Random RCL candidate.
+	 */
+	public abstract E chooseRandom();
 
 	/**
 	 * Constructor for the AbstractGRASP class.
@@ -180,8 +187,7 @@ public abstract class AbstractGRASP<E> {
 			}
 
 			/* Choose a candidate randomly from the RCL */
-			int rndIndex = rng.nextInt(RCL.size());
-			E inCand = RCL.get(rndIndex);
+			E inCand = chooseRandom();
 			CL.remove(inCand);
 			currentSol.add(inCand);
 			ObjFunction.evaluate(currentSol);

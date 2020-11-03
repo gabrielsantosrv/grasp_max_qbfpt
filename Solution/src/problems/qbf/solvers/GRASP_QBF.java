@@ -157,6 +157,12 @@ public class GRASP_QBF extends AbstractGRASP<Integer> {
 
 		return null;
 	}
+	
+	@Override
+	public Integer chooseRandom(){
+		int rndIndex = rng.nextInt(RCL.size());
+		return RCL.get(rndIndex);
+	}
 
 	/**
 	 * A main method used for testing the GRASP metaheuristic.
