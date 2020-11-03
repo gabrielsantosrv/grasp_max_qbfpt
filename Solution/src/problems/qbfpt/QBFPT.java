@@ -6,7 +6,6 @@ import solutions.Solution;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * A quadractic binary function (QBFPT) is a function that can be expressed as the
@@ -24,8 +23,10 @@ import java.util.Collections;
  */
 public class QBFPT implements Evaluator<Integer> {
 
-	private static final int PI1 = 193;
-	private static final int PI2 = 1093;
+	private static final int GPI1 = 131;
+	private static final int GPI2 = 1031;
+	private static final int HPI1 = 193;
+	private static final int HPI2 = 1093;
 
 	/**
 	 * Dimension of the domain.
@@ -59,50 +60,55 @@ public class QBFPT implements Evaluator<Integer> {
 		variables = allocateVariables();
 		triples = generate_triples();
 	}
-
+	
 	private int[] generate_triple_aux(int u, int n){
-		int l = 1 + ((PI1 * (u - 1) + PI2) % n);
-		int g;
+		int l,g,h;
+		int aux;
+		
+		// Generating first l(u).
+		l = 1 + ((GPI1 * (u - 1) + GPI2) % n);
+		
+		// Choosing g(u).
+		g = (l != u) ? l:(1 + (l % n));
 
-		if(l  != u){
-			g = l;
-		}else{
-			g = 1 + (l % n);
-		}
-
-		int h;
-
+		// Generating second l(u).
+		l = 1 + ((HPI1 * (u - 1) + HPI2) % n);
+		
+		// Choosing h(u).
 		if(l != u && l != g){
 			h = l;
 		}else{
-			int aux = (1 + (l % n));
+			aux = (1 + (l % n));
 			if(aux != u && aux != g){
 				h = aux;
 			}else{
 				h = 1 + ((l + 1) % n);
 			}
 		}
-
-		ArrayList tuple = new ArrayList<Integer>();
-		tuple.add(u);
-		tuple.add(g);
-		tuple.add(h);
-		Collections.sort(tuple);
-
-		int output[] = {((Integer)tuple.get(0)).intValue(),
-						((Integer)tuple.get(1)).intValue(),
-						((Integer)tuple.get(2)).intValue()};
-		return output;
+		
+		// Building output
+		int triple[] = {u-1, g-1, h-1};
+		Arrays.sort(triple);
+		return triple;
 	}
 
+	/**
+	 * Generate forbidden triples for QBFPT.
+	 * Triples are in the format sort{u, g(u), h(u)}
+	 * Both functions are based on a l(u) function.
+	 * l(u) = 1 + ((pi1 * (u-1) + pi2) mod n)
+	 * g(u) = 1+l(u) mod n if l(u) = u, else l(u)
+	 * h(u) = {l(u) if l(u) != u and l(u) != g(u)
+	 * 		   1 + l(u) mod n if this value != u and g(u)
+	 * 		   else 1 + (l(u)+1) mod n}
+	 * Values of pi are different for g(u) and h(u). 
+	 * @return _triples ArrayList of forbidden triples.
+	 */
 	private ArrayList<int[]> generate_triples(){
 		ArrayList<int[]> _triples = new ArrayList<>();
-		for(int i=0; i < this.size; i++){
-			int[] triple = generate_triple_aux(i, this.size);
-			_triples.add(triple);
+		for(int i=1; i <= this.size; i++){
+			_triples.add(generate_triple_aux(i, this.size));
 		}
-		int[] aux = {2, 4, 14};
-		_triples.add(aux);
 		return _triples;
 	}
 
