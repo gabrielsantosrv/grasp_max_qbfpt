@@ -22,6 +22,22 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		FI,
 		BI
 	}
+
+	private enum Construction {
+		DEF,
+		RPG
+	}
+
+	/**
+	 * Value to represent the construction type.
+	 * Can be default (DEF) or random plus greedy (RPG).
+	 */
+	private final Construction constructionType;
+
+	/**
+	 * Value that represents after how many iterations the random construction must turn greedy.
+	 */
+	private final int rpgP;
 	
 	/**
 	 * Value to represent local search type.
@@ -41,14 +57,22 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * @param filename
 	 *            Name of the file for which the objective function parameters
 	 *            should be read.
-	 * @param type
+	 * @param searchType
 	 * 			  Type of local search strategy to be used.
+	 * @param constructionType
+	 * 				Type of construction to be used.
+	 * @param  rpgP
+	 * 				Number of iterations needed to change from random
+	 * 				to greedy when using the random plus greedy construction.
 	 * @throws IOException
 	 *             necessary for I/O operations.
 	 */
-	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, SearchStrategy type) throws IOException {
+	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, SearchStrategy searchType,
+					   Construction constructionType, int rpgP) throws IOException {
 		super(new QBFPT_Inverse(filename), alpha, iterations);
-		this.searchType = type;
+		this.searchType = searchType;
+		this.constructionType = constructionType;
+		this.rpgP = rpgP;
 	}
 
 	/*
@@ -305,7 +329,9 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25, 
 											1000,
 											"instances/qbf080", 
-											SearchStrategy.BI);
+											SearchStrategy.BI,
+											Construction.RPG,
+											500);
 		
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
