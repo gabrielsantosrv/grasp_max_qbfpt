@@ -18,7 +18,7 @@ import java.util.Arrays;
  * problem: a survey. J Comb Optim (2014) 28:58–81. DOI
  * 10.1007/s10878-014-9734-0.
  * 
- * @author ccavellucci, fusberti
+ * @author ccavellucci, fusberti, gabrielsantosrv, vferrari
  *
  */
 public class QBFPT implements Evaluator<Integer> {

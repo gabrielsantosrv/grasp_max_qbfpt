@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * {@link #QuadracticBinaryFunction}). Since by default this GRASP considers
  * minimization problems, an inverse QBFPT function is adopted.
  * 
- * @author ccavellucci, fusberti
+ * @author ccavellucci, fusberti, vferrari, gabrielsantosrv
  */
 public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	private enum SearchStrategy {
@@ -220,6 +220,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 			}
 			
 			// Evaluate exchanges
+			boolean done = false;
 			for (Integer candIn : CL) {
 				for (Integer candOut : currentSol) {
 					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, currentSol);
@@ -227,9 +228,11 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 						minDeltaCost = deltaCost;
 						firstCandIn = candIn;
 						firstCandOut = candOut;
+						done = true;
 						break;
 					}
 				}
+				if(done) break;
 			}
 			// Implement the best first move, if it reduces the solution cost.
 			if (minDeltaCost < -Double.MIN_VALUE) {
@@ -262,8 +265,8 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		
 		// Get bias.
 		for(i=0; i<RCL.size(); i++) {
-			probs[i] = 1;
-			totalBias += 1;
+			probs[i] = bias(RCL.get(i));
+			totalBias += probs[i];
 		}
 		
 		// Calculate probabilities.
@@ -284,6 +287,14 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		
 		return RCL.get(rndIndex);
 	}
+	
+	private double bias(Integer i) {
+		return 1;
+		//return 1/(float)i;
+		//return 1/(Math.log(i+1));
+		//return Math.pow(Math.E, -i);
+		//return Math.pow(i, -2);
+	}
 
 	/**
 	 * A main method used for testing the GRASP metaheuristic.
@@ -293,7 +304,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		long startTime = System.currentTimeMillis();
 		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25, 
 											1000,
-											"instances/qbf020", 
+											"instances/qbf080", 
 											SearchStrategy.BI);
 		
 		Solution<Integer> bestSol = grasp.solve();

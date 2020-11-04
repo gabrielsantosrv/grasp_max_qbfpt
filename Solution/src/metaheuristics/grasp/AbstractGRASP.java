@@ -13,7 +13,7 @@ import solutions.Solution;
  * Abstract class for metaheuristic GRASP (Greedy Randomized Adaptive Search
  * Procedure). It consider a minimization problem.
  * 
- * @author ccavellucci, fusberti
+ * @author ccavellucci, fusberti, vferrari, gabrielsantosrv
  * @param <E>
  *            Generic type of the element which composes the solution.
  */
