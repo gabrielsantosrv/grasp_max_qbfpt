@@ -7,17 +7,34 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import problems.Evaluator;
+import problems.qbfpt.solvers.GRASP_QBFPT;
 import solutions.Solution;
 
 /**
  * Abstract class for metaheuristic GRASP (Greedy Randomized Adaptive Search
  * Procedure). It consider a minimization problem.
  * 
- * @author ccavellucci, fusberti, vferrari, gabrielsantosrv
+ * @author ccavellucci, fusberti, vferrari, gabrielsantosrv, satoru27
  * @param <E>
  *            Generic type of the element which composes the solution.
  */
 public abstract class AbstractGRASP<E> {
+
+	public enum Construction {
+		DEF,
+		RPG
+	}
+
+	/**
+	 * Value to represent the construction type.
+	 * Can be default (DEF) or random plus greedy (RPG).
+	 */
+	private final Construction constructionType;
+
+	/**
+	 * Value that represents after how many iterations the random construction must turn greedy.
+	 */
+	private final int rpgP;
 
 	/**
 	 * flag that indicates whether the code should print more information on
@@ -135,10 +152,12 @@ public abstract class AbstractGRASP<E> {
 	 * @param iterations
 	 *            The number of iterations which the GRASP will be executed.
 	 */
-	public AbstractGRASP(Evaluator<E> objFunction, Double alpha, Integer iterations) {
+	public AbstractGRASP(Evaluator<E> objFunction, Double alpha, Integer iterations, Construction constructionType, int rpgP) {
 		this.ObjFunction = objFunction;
 		this.alpha = alpha;
 		this.iterations = iterations;
+		this.constructionType = constructionType;
+		this.rpgP = rpgP;
 	}
 	
 	/**
@@ -148,7 +167,7 @@ public abstract class AbstractGRASP<E> {
 	 * 
 	 * @return A feasible solution to the problem being minimized.
 	 */
-	public Solution<E> constructiveHeuristic() {
+	public Solution<E> constructiveHeuristic(int iteration) {
 
 		CL = makeCL();
 		RCL = makeRCL();
@@ -173,6 +192,19 @@ public abstract class AbstractGRASP<E> {
 					minCost = deltaCost;
 				if (deltaCost > maxCost)
 					maxCost = deltaCost;
+			}
+
+			if (constructionType == Construction.RPG){
+				/*
+				 * Assumes that when the construction is random plus greedy,
+				 * the initial alpha value is >= 0.5
+				 * with alpha = 0 being a pure greedy algorithm
+				 * and alpha = 1 being a pure random algorithm
+				 * "mirroring" the current alpha value.
+				 */
+				if(iteration > rpgP){
+					this.alpha = 1 - this.alpha;
+				}
 			}
 
 			/*
@@ -209,7 +241,7 @@ public abstract class AbstractGRASP<E> {
 
 		incumbentSol = createEmptySol();
 		for (int i = 0; i < iterations; i++) {
-			constructiveHeuristic();
+			constructiveHeuristic(i);
 			localSearch();
 			if (incumbentSol.cost > currentSol.cost) {
 				incumbentSol = new Solution<E>(currentSol);

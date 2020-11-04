@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * {@link #QuadracticBinaryFunction}). Since by default this GRASP considers
  * minimization problems, an inverse QBFPT function is adopted.
  * 
- * @author ccavellucci, fusberti, vferrari, gabrielsantosrv
+ * @author ccavellucci, fusberti, vferrari, gabrielsantosrv, satoru27
  */
 public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	private enum SearchStrategy {
@@ -23,22 +23,6 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		BI
 	}
 
-	private enum Construction {
-		DEF,
-		RPG
-	}
-
-	/**
-	 * Value to represent the construction type.
-	 * Can be default (DEF) or random plus greedy (RPG).
-	 */
-	private final Construction constructionType;
-
-	/**
-	 * Value that represents after how many iterations the random construction must turn greedy.
-	 */
-	private final int rpgP;
-	
 	/**
 	 * Value to represent local search type.
 	 * Can be first-improving (FI) or best-improving (BI). 
@@ -68,11 +52,9 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 *             necessary for I/O operations.
 	 */
 	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, SearchStrategy searchType,
-					   Construction constructionType, int rpgP) throws IOException {
-		super(new QBFPT_Inverse(filename), alpha, iterations);
+					   AbstractGRASP.Construction constructionType, int rpgP) throws IOException {
+		super(new QBFPT_Inverse(filename), alpha, iterations, constructionType, rpgP);
 		this.searchType = searchType;
-		this.constructionType = constructionType;
-		this.rpgP = rpgP;
 	}
 
 	/*
@@ -326,11 +308,11 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25, 
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.8,
 											1000,
 											"instances/qbf080", 
 											SearchStrategy.BI,
-											Construction.RPG,
+											AbstractGRASP.Construction.RPG,
 											500);
 		
 		Solution<Integer> bestSol = grasp.solve();
