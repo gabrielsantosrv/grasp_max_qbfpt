@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import problems.Evaluator;
-import problems.qbfpt.solvers.GRASP_QBFPT;
 import solutions.Solution;
 
 /**
@@ -242,7 +241,10 @@ public abstract class AbstractGRASP<E> {
 	 */
 	public Solution<E> solve(double maxTime) {
 		long startTime = System.currentTimeMillis();
+		long endTime;
+		double totalTime;
 		incumbentSol = createEmptySol();
+		
 		for (int i = 0; i < iterations; i++) {
 			constructiveHeuristic();
 			localSearch();
@@ -251,13 +253,12 @@ public abstract class AbstractGRASP<E> {
 				if (verbose)
 					System.out.println("(Iter. " + i + ") BestSol = " + incumbentSol);
 			}
-			long endTime   = System.currentTimeMillis();
-			double totalTime = (double)(endTime - startTime)/(double)1000;
+			
+			endTime   = System.currentTimeMillis();
+			totalTime = (endTime - startTime)/(double)1000;
 
 			//if it exceeded the time limit of 1800s (30 min), then break the loop
-			if(totalTime > maxTime)
-				break;
-
+			if(totalTime > maxTime) break;
 		}
 
 		return incumbentSol;

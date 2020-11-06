@@ -8,6 +8,7 @@ import solutions.Solution;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.stream.DoubleStream;
 
 /**
  * Metaheuristic GRASP (Greedy Randomized Adaptive Search Procedure) for
@@ -184,6 +185,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 
 		Double minDeltaCost;
 		Integer bestCandIn = null, bestCandOut = null;
+		double deltaCost;
 
 		do {
 			minDeltaCost = Double.POSITIVE_INFINITY;
@@ -191,7 +193,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 				
 			// Evaluate insertions
 			for (Integer candIn : CL) {
-				double deltaCost = ObjFunction.evaluateInsertionCost(candIn, currentSol);
+				deltaCost = ObjFunction.evaluateInsertionCost(candIn, currentSol);
 				if (deltaCost < minDeltaCost) {
 					minDeltaCost = deltaCost;
 					bestCandIn = candIn;
@@ -200,7 +202,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 			}
 			// Evaluate removals
 			for (Integer candOut : currentSol) {
-				double deltaCost = ObjFunction.evaluateRemovalCost(candOut, currentSol);
+				deltaCost = ObjFunction.evaluateRemovalCost(candOut, currentSol);
 				if (deltaCost < minDeltaCost) {
 					minDeltaCost = deltaCost;
 					bestCandIn = null;
@@ -210,7 +212,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 			// Evaluate exchanges
 			for (Integer candIn : CL) {
 				for (Integer candOut : currentSol) {
-					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, currentSol);
+					deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, currentSol);
 					if (deltaCost < minDeltaCost) {
 						minDeltaCost = deltaCost;
 						bestCandIn = candIn;
@@ -242,6 +244,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 
 		Double minDeltaCost;
 		Integer firstCandIn = null, firstCandOut = null;
+		double deltaCost;
 
 		do {
 			minDeltaCost = Double.POSITIVE_INFINITY;
@@ -249,7 +252,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 				
 			// Evaluate insertions
 			for (Integer candIn : CL) {
-				double deltaCost = ObjFunction.evaluateInsertionCost(candIn, currentSol);
+				deltaCost = ObjFunction.evaluateInsertionCost(candIn, currentSol);
 				if (deltaCost < minDeltaCost) {
 					minDeltaCost = deltaCost;
 					firstCandIn = candIn;
@@ -260,7 +263,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 			
 			// Evaluate removals
 			for (Integer candOut : currentSol) {
-				double deltaCost = ObjFunction.evaluateRemovalCost(candOut, currentSol);
+				deltaCost = ObjFunction.evaluateRemovalCost(candOut, currentSol);
 				if (deltaCost < minDeltaCost) {
 					minDeltaCost = deltaCost;
 					firstCandIn = null;
@@ -273,7 +276,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 			boolean done = false;
 			for (Integer candIn : CL) {
 				for (Integer candOut : currentSol) {
-					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, currentSol);
+					deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, currentSol);
 					if (deltaCost < minDeltaCost) {
 						minDeltaCost = deltaCost;
 						firstCandIn = candIn;
@@ -323,9 +326,8 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		}
 		
 		// Calculate probabilities.
-		for(i=0; i<RCL.size(); i++) {
-			probs[i] /= totalBias;
-		}
+		final double biasSum = totalBias;
+		probs = DoubleStream.of(probs).map(p->p/biasSum).toArray();
 		
 		// Get random value from weighted probs.
 		int rndIndex=0;
