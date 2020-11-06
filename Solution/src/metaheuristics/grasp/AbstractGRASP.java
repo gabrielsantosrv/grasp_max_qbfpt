@@ -174,6 +174,11 @@ public abstract class AbstractGRASP<E> {
 		RCL = makeRCL();
 		currentSol = createEmptySol();
 		currentCost = Double.POSITIVE_INFINITY;
+		
+		// Initialize alpha with random.
+		if (constructionType == Construction.RPG){
+            this.alpha = 1.0;
+		}
 
 		/* Main loop, which repeats until the stopping criteria is reached. */
 		while (!constructiveStopCriteria()) {
@@ -195,11 +200,12 @@ public abstract class AbstractGRASP<E> {
 					maxCost = deltaCost;
 			}
             
-            // Random plus greedy.
-            // Iterations [0,p) - Random: alpha=1
-            // Iterations [p,n) - Greedy: alpha=0
-			if (constructionType == Construction.RPG){
-                this.alpha = (iter < this.rpgP) ? 1.0:0.0;
+            /* Random plus greedy.
+             *  Iterations [0,p) - Random: alpha=1
+             *	Iterations [p,n) - Greedy: alpha=0
+             */
+			if (constructionType == Construction.RPG && iter == this.rpgP){
+                this.alpha = 0.0;
 			}
 
 			/*

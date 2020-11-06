@@ -309,11 +309,11 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 
 		long startTime = System.currentTimeMillis();
 		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25,
-											1000,
+											2000,
 											"instances/qbf080", 
-											SearchStrategy.BI,
+											SearchStrategy.FI,
 											AbstractGRASP.Construction.RPG,
-											800);
+											2);
 		
 		Solution<Integer> bestSol = grasp.solve(1800.0);
 		System.out.println("maxVal = " + bestSol);
