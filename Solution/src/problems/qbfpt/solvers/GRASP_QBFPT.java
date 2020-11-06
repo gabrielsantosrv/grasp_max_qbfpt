@@ -308,14 +308,14 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.8,
+		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25,
 											1000,
 											"instances/qbf080", 
 											SearchStrategy.BI,
 											AbstractGRASP.Construction.RPG,
-											500);
+											800);
 		
-		Solution<Integer> bestSol = grasp.solve();
+		Solution<Integer> bestSol = grasp.solve(1800.0);
 		System.out.println("maxVal = " + bestSol);
 
 		long endTime   = System.currentTimeMillis();

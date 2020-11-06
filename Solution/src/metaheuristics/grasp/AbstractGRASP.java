@@ -167,7 +167,8 @@ public abstract class AbstractGRASP<E> {
 	 * 
 	 * @return A feasible solution to the problem being minimized.
 	 */
-	public Solution<E> constructiveHeuristic(int iteration) {
+	public Solution<E> constructiveHeuristic() {
+        int iter=0;
 
 		CL = makeCL();
 		RCL = makeRCL();
@@ -193,18 +194,12 @@ public abstract class AbstractGRASP<E> {
 				if (deltaCost > maxCost)
 					maxCost = deltaCost;
 			}
-
+            
+            // Random plus greedy.
+            // Iterations [0,p) - Random: alpha=1
+            // Iterations [p,n) - Greedy: alpha=0
 			if (constructionType == Construction.RPG){
-				/*
-				 * Assumes that when the construction is random plus greedy,
-				 * the initial alpha value is >= 0.5
-				 * with alpha = 0 being a pure greedy algorithm
-				 * and alpha = 1 being a pure random algorithm
-				 * "mirroring" the current alpha value.
-				 */
-				if(iteration > rpgP){
-					this.alpha = 1 - this.alpha;
-				}
+                this.alpha = (iter < this.rpgP) ? 1.0:0.0;
 			}
 
 			/*
@@ -224,7 +219,9 @@ public abstract class AbstractGRASP<E> {
 			currentSol.add(inCand);
 			ObjFunction.evaluate(currentSol);
 			RCL.clear();
-
+            
+            // Increase iteration count.
+            iter++;
 		}
 
 		return currentSol;
@@ -237,11 +234,11 @@ public abstract class AbstractGRASP<E> {
 	 * 
 	 * @return The best feasible solution obtained throughout all iterations.
 	 */
-	public Solution<E> solve() {
+	public Solution<E> solve(double maxTime) {
 		long startTime = System.currentTimeMillis();
 		incumbentSol = createEmptySol();
 		for (int i = 0; i < iterations; i++) {
-			constructiveHeuristic(i);
+			constructiveHeuristic();
 			localSearch();
 			if (incumbentSol.cost > currentSol.cost) {
 				incumbentSol = new Solution<E>(currentSol);
@@ -252,7 +249,7 @@ public abstract class AbstractGRASP<E> {
 			double totalTime = (double)(endTime - startTime)/(double)1000;
 
 			//if it exceeded the time limit of 1800s (30 min), then break the loop
-			if(totalTime > 1800.0)
+			if(totalTime > maxTime)
 				break;
 
 		}
