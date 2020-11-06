@@ -7,7 +7,7 @@ import solutions.Solution;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.Comparator;
 
 /**
  * Metaheuristic GRASP (Greedy Randomized Adaptive Search Procedure) for
@@ -22,12 +22,53 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		FI,
 		BI
 	}
+	
+	/**
+	 * Bias Function enum.
+	 * Provides bias functions for each enum value.
+	 */
+	private enum biasFunction {
+		RANDOM{
+			@Override double bias(final Integer i) {
+				return 1;
+			}
+		},
+		LINEAR{
+			@Override double bias(final Integer i) {
+				return 1/(float)i;
+			}
+		},
+		LOG{
+			@Override double bias(final Integer i) {
+				return 1/(Math.log(i+1));
+			}
+		},
+		EXP{
+			@Override double bias(final Integer i) {
+				return Math.pow(Math.E, -i);
+			}
+		},
+		POL{
+			@Override double bias(final Integer i) {
+				return Math.pow(i, -2);
+			}
+		};
+		
+		abstract double bias(final Integer i);
+	}
 
 	/**
 	 * Value to represent local search type.
 	 * Can be first-improving (FI) or best-improving (BI). 
 	 */
 	private final SearchStrategy searchType;
+	
+	/**
+	 * Value to represent bias function.
+	 * Can be random, linear, logarithmic, exponential and polynomial.
+	 * Default grasp uses RANDOM bias. 
+	 */
+	private final biasFunction bF;
 	
 	/**
 	 * Constructor for the GRASP_QBFPT class. An inverse QBFPT objective function is
@@ -51,10 +92,13 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * @throws IOException
 	 *             necessary for I/O operations.
 	 */
-	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, SearchStrategy searchType,
-					   AbstractGRASP.Construction constructionType, int rpgP) throws IOException {
+	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, 
+					   SearchStrategy searchType, biasFunction bF,
+					   AbstractGRASP.Construction constructionType, int rpgP) 
+							   throws IOException {
 		super(new QBFPT_Inverse(filename), alpha, iterations, constructionType, rpgP);
 		this.searchType = searchType;
+		this.bF = bF;
 	}
 
 	/*
@@ -269,9 +313,12 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		double totalBias = 0;
 		int i;
 		
+		// Rank (sort) RCL
+		RCL.sort(Comparator.comparingDouble(x -> ObjFunction.evaluateInsertionCost(x, currentSol)));
+		
 		// Get bias.
 		for(i=0; i<RCL.size(); i++) {
-			probs[i] = bias(RCL.get(i));
+			probs[i] = bF.bias(i+1);
 			totalBias += probs[i];
 		}
 		
@@ -293,14 +340,6 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		
 		return RCL.get(rndIndex);
 	}
-	
-	private double bias(Integer i) {
-		return 1;
-		//return 1/(float)i;
-		//return 1/(Math.log(i+1));
-		//return Math.pow(Math.E, -i);
-		//return Math.pow(i, -2);
-	}
 
 	/**
 	 * A main method used for testing the GRASP metaheuristic.
@@ -310,9 +349,10 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		long startTime = System.currentTimeMillis();
 		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25,
 											2000,
-											"instances/qbf080", 
-											SearchStrategy.FI,
-											AbstractGRASP.Construction.RPG,
+											"instances/qbf100", 
+											SearchStrategy.BI,
+											biasFunction.LINEAR,
+											AbstractGRASP.Construction.DEF,
 											2);
 		
 		Solution<Integer> bestSol = grasp.solve(1800.0);
