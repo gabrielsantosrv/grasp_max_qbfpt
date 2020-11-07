@@ -249,7 +249,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		boolean done=false;
 
 		do {
-			minDeltaCost = Double.POSITIVE_INFINITY;
+			minDeltaCost = 0.0;
 			updateCL();
 				
 			// Evaluate insertions
@@ -399,40 +399,34 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		// Changeable parameters.
 		double alpha1 = 0.25, alpha2 = 0.7;
 		
-		GRASP_QBFPT.run(alpha2, maxIterations, "instances/qbf200", 
-						SearchStrategy.BI, BiasFunction.LINEAR,
-						AbstractGRASP.Construction.DEF, rpgP, maxTime);
+		// 1 - Testing default/alpha1/best-improving/random bias.
+		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
+							BiasFunction.RANDOM,
+							AbstractGRASP.Construction.DEF, 
+							rpgP, maxTime);
+
+		// 2 - Testing default/alpha1/best-improving/linear bias.
+		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
+							BiasFunction.LINEAR,
+							AbstractGRASP.Construction.DEF, 
+							rpgP, maxTime);
 		
-//		// 1 - Testing default/alpha1/best-improving/random bias.
-//		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
-//							BiasFunction.RANDOM,
-//							AbstractGRASP.Construction.DEF, 
-//							rpgP, maxTime);
-//
-//		// 2 - Testing default/alpha1/first-improving/random bias.
-//		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.FI, 
-//							BiasFunction.LINEAR,
-//							AbstractGRASP.Construction.DEF, 
-//							rpgP, maxTime);
-//
-//		// 3 - Testing RPG/best-improving/random bias.
-//		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
-//							BiasFunction.RANDOM,
-//							AbstractGRASP.Construction.RPG, 
-//							rpgP, maxTime);
-//		
-//		// 4 - Testing default/alpha1/best-improving/linear bias.
-//		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
-//							BiasFunction.LINEAR,
-//							AbstractGRASP.Construction.DEF, 
-//							rpgP, maxTime);
-//		
-//		// 5 - Testing default/alpha2/best-improving/linear bias.
-//		GRASP_QBFPT.testAll(alpha2, maxIterations, SearchStrategy.BI, 
-//							BiasFunction.LINEAR,
-//							AbstractGRASP.Construction.DEF, 
-//							rpgP, maxTime);
-//		
-//		
+		// 3 - Testing default/alpha2/best-improving/linear bias.
+		GRASP_QBFPT.testAll(alpha2, maxIterations, SearchStrategy.BI, 
+							BiasFunction.LINEAR,
+							AbstractGRASP.Construction.DEF, 
+							rpgP, maxTime);
+
+		// 4 - Testing RPG/best-improving/linear bias.
+		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
+							BiasFunction.LINEAR,
+							AbstractGRASP.Construction.RPG, 
+							rpgP, maxTime);
+
+		// 5 - Testing RPG/first-improving/linear bias.
+		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.FI, 
+							BiasFunction.LINEAR,
+							AbstractGRASP.Construction.RPG, 
+							rpgP, maxTime);		
 	}
 }

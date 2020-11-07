@@ -240,12 +240,13 @@ public abstract class AbstractGRASP<E> {
 	 * @return The best feasible solution obtained throughout all iterations.
 	 */
 	public Solution<E> solve(double maxTime) {
+		int i;
 		long startTime = System.currentTimeMillis();
 		long endTime;
 		double totalTime;
 		incumbentSol = createEmptySol();
 		
-		for (int i = 0; i < iterations; i++) {
+		for (i = 0; i < iterations; i++) {
 			constructiveHeuristic();
 			localSearch();
 			if (incumbentSol.cost > currentSol.cost) {
@@ -260,6 +261,9 @@ public abstract class AbstractGRASP<E> {
 			//if it exceeded the time limit of 1800s (30 min), then break the loop
 			if(totalTime > maxTime) break;
 		}
+		
+		if(verbose)
+			System.out.println("Total iterations: " + i);
 
 		return incumbentSol;
 	}
