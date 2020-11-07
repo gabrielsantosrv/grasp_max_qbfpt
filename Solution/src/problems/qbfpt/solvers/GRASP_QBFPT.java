@@ -28,7 +28,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * Bias Function enum.
 	 * Provides bias functions for each enum value.
 	 */
-	private enum biasFunction {
+	private enum BiasFunction {
 		RANDOM{
 			@Override double bias(final Integer i) {
 				return 1;
@@ -69,7 +69,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 * Can be random, linear, logarithmic, exponential and polynomial.
 	 * Default grasp uses RANDOM bias. 
 	 */
-	private final biasFunction bF;
+	private final BiasFunction bF;
 	
 	/**
 	 * Constructor for the GRASP_QBFPT class. An inverse QBFPT objective function is
@@ -94,9 +94,10 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 	 *             necessary for I/O operations.
 	 */
 	public GRASP_QBFPT(Double alpha, Integer iterations, String filename, 
-					   SearchStrategy searchType, biasFunction bF,
+					   SearchStrategy searchType, BiasFunction bF,
 					   AbstractGRASP.Construction constructionType, int rpgP) 
-							   throws IOException {
+		   throws IOException {
+		
 		super(new QBFPT_Inverse(filename), alpha, iterations, constructionType, rpgP);
 		this.searchType = searchType;
 		this.bF = bF;
@@ -245,6 +246,7 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		Double minDeltaCost;
 		Integer firstCandIn = null, firstCandOut = null;
 		double deltaCost;
+		boolean done=false;
 
 		do {
 			minDeltaCost = Double.POSITIVE_INFINITY;
@@ -273,7 +275,6 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 			}
 			
 			// Evaluate exchanges
-			boolean done = false;
 			for (Integer candIn : CL) {
 				for (Integer candOut : currentSol) {
 					deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, currentSol);
@@ -342,26 +343,96 @@ public class GRASP_QBFPT extends AbstractGRASP<Integer> {
 		
 		return RCL.get(rndIndex);
 	}
-
+	
 	/**
-	 * A main method used for testing the GRASP metaheuristic.
+	 * Run GRASP for QBFPT.
 	 */
-	public static void main(String[] args) throws IOException {
-
-		long startTime = System.currentTimeMillis();
-		GRASP_QBFPT grasp = new GRASP_QBFPT(0.25,
-											2000,
-											"instances/qbf100", 
-											SearchStrategy.BI,
-											biasFunction.LINEAR,
-											AbstractGRASP.Construction.DEF,
-											2);
+	public static void run(double alpha, int maxIt, String filename,
+						   SearchStrategy searchType, BiasFunction biasType,
+						   AbstractGRASP.Construction constrMethod, int rpgP,
+						   double maxTime) 
+					   throws IOException {
 		
-		Solution<Integer> bestSol = grasp.solve(1800.0);
+		long startTime = System.currentTimeMillis();
+		GRASP_QBFPT grasp = new GRASP_QBFPT(alpha,
+											maxIt,
+											filename, 
+											searchType,
+											biasType,
+											constrMethod,
+											rpgP);
+		
+		Solution<Integer> bestSol = grasp.solve(maxTime);
 		System.out.println("maxVal = " + bestSol);
 
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
-		System.out.println("Time = "+(double)totalTime/(double)1000+" seg");
+		System.out.println("Time = "+(double)totalTime/(double)1000+" seg");		
+	}
+	
+	public static void testAll(double alpha, int maxIt,
+							   SearchStrategy searchType, 
+							   BiasFunction biasType,
+							   AbstractGRASP.Construction constrMethod, 
+							   int rpgP, double maxTime) 
+					   throws IOException {
+		
+		String inst[] = {"020", "040", "060", "080", "100", "200", "400"};
+		
+		for(String file : inst) {
+			GRASP_QBFPT.run(alpha, maxIt, "instances/qbf" + file, 
+							searchType, biasType, constrMethod,
+							rpgP, maxTime);
+		}
+	}
+	
+	/**
+	 * A main method used for testing the GRASP metaheuristic.
+	 */
+	public static void main(String[] args) throws IOException {
+		
+		// Fixed parameters
+		double maxTime = 1800.0;
+		int maxIterations = 1000;
+		int rpgP = 2;
+		
+		// Changeable parameters.
+		double alpha1 = 0.25, alpha2 = 0.7;
+		
+		GRASP_QBFPT.run(alpha2, maxIterations, "instances/qbf200", 
+						SearchStrategy.BI, BiasFunction.LINEAR,
+						AbstractGRASP.Construction.DEF, rpgP, maxTime);
+		
+//		// 1 - Testing default/alpha1/best-improving/random bias.
+//		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
+//							BiasFunction.RANDOM,
+//							AbstractGRASP.Construction.DEF, 
+//							rpgP, maxTime);
+//
+//		// 2 - Testing default/alpha1/first-improving/random bias.
+//		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.FI, 
+//							BiasFunction.LINEAR,
+//							AbstractGRASP.Construction.DEF, 
+//							rpgP, maxTime);
+//
+//		// 3 - Testing RPG/best-improving/random bias.
+//		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
+//							BiasFunction.RANDOM,
+//							AbstractGRASP.Construction.RPG, 
+//							rpgP, maxTime);
+//		
+//		// 4 - Testing default/alpha1/best-improving/linear bias.
+//		GRASP_QBFPT.testAll(alpha1, maxIterations, SearchStrategy.BI, 
+//							BiasFunction.LINEAR,
+//							AbstractGRASP.Construction.DEF, 
+//							rpgP, maxTime);
+//		
+//		// 5 - Testing default/alpha2/best-improving/linear bias.
+//		GRASP_QBFPT.testAll(alpha2, maxIterations, SearchStrategy.BI, 
+//							BiasFunction.LINEAR,
+//							AbstractGRASP.Construction.DEF, 
+//							rpgP, maxTime);
+//		
+//		
 	}
 }
